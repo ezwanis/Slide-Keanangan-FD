@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kenangan Keluarga Kita - Family Day Montage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: #000;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        /* Opening Title Screen */
+        .opening-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 2s ease-in;
+        }
+
+        .opening-screen.hide {
+            animation: fadeOut 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        .opening-title {
+            font-size: 4rem;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 0.3rem;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        .opening-subtitle {
+            font-size: 1.5rem;
+            color: #ddd;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .start-button {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
+        }
+
+        /* Main Slideshow Container */
+        .slideshow-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            overflow: hidden;
+        }
+
+        /* Particles Background */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: float linear infinite;
+        }
+
+        /* Slide */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+            animation: slideIn 1.5s ease-in-out;
+        }
+
+        .slide-image-container {
+            position: relative;
+            width: 85%;
+            height: 85%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.8));
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            animation: kenBurns 8s ease-in-out;
+            filter: 
+                contrast(1.1) 
+                brightness(0.95) 
+                saturate(1.2);
+        }
+
+        /* Vignette Effect */
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, transparent 30%, rgba(0, 0, 0, 0.8) 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Film Grain */
+        .slide::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.05"/></svg>');
+            pointer-events: none;
+            z-index: 3;
+            animation: grain 0.5s steps(10) infinite;
+        }
+
+        /* Text Overlay */
+        .slide-text {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: #000;
+            z-index: 4;
+            max-width: 80%;
+            text-shadow: 
+                0 0 10px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(255, 255, 255, 0.6),
+                0 0 30px rgba(255, 255, 255, 0.4),
+                2px 2px 4px rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .slide-caption {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.1rem;
+            opacity: 0;
+            animation: textFadeIn 2s ease-in forwards;
+            animation-delay: 0.5s;
+            color: #000;
+        }
+
+        .slide-quote {
+            font-size: 1.2rem;
+            font-style: italic;
+            opacity: 0;
+            animation: textFadeIn 2s ease-in forwards;
+            animation-delay: 1s;
+            color: #222;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            z-index: 100;
+            transition: width 0.1s linear, opacity 0.5s ease;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+        }
+
+        .progress-bar.hidden {
+            opacity: 0;
+        }
+
+        /* Counter */
+        .counter {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.1rem;
+            z-index: 100;
+            letter-spacing: 0.2rem;
+            font-family: 'Courier New', monospace;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .counter.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+            opacity: 0.8;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .controls:hover {
+            opacity: 1;
+        }
+
+        .controls.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .control-btn.play-pause {
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+        }
+
+        /* Music Control */
+        .music-control {
+            position: fixed;
+            top: 30px;
+            left: 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .music-control.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .music-info {
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .music-title {
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .music-artist {
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .music-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .music-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.3);
+            outline: none;
+            border-radius: 2px;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: white;
+            cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Ending Screen */
+        .ending-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+        }
+
+        .ending-screen.show {
+            display: flex;
+            animation: fadeIn 3s ease-in forwards;
+        }
+
+        .ending-title {
+            font-size: 3.5rem;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 0.2rem;
+            animation: titleGlow 3s ease-in-out infinite;
+        }
+
+        .ending-message {
+            font-size: 1.5rem;
+            color: #ddd;
+            text-align: center;
+            max-width: 800px;
+            line-height: 2;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+
+        /* Play/Pause Indicator */
+        .playback-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            color: rgba(255, 255, 255, 0.9);
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            text-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            transition: opacity 0.3s ease;
+        }
+
+        .playback-indicator.show {
+            animation: indicatorPulse 0.6s ease-out;
+        }
+
+        @keyframes indicatorPulse {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            50% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes kenBurns {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+            50% {
+                transform: scale(1.15) translate(-2%, -2%);
+            }
+            100% {
+                transform: scale(1.08) translate(1%, 1%);
+            }
+        }
+
+        @keyframes textFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            }
+            50% {
+                text-shadow: 0 0 50px rgba(255, 255, 255, 0.8), 0 0 80px rgba(102, 126, 234, 0.6);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        @keyframes grain {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5%, -5%); }
+            20% { transform: translate(-10%, 5%); }
+            30% { transform: translate(5%, -10%); }
+            40% { transform: translate(-5%, 15%); }
+            50% { transform: translate(-10%, 5%); }
+            60% { transform: translate(15%, 0); }
+            70% { transform: translate(0, 10%); }
+            80% { transform: translate(-15%, 0); }
+            90% { transform: translate(10%, 5%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .opening-title {
+                font-size: 2.5rem;
+            }
+            .opening-subtitle {
+                font-size: 1rem;
+            }
+            .slide-caption {
+                font-size: 1.3rem;
+            }
+            .slide-quote {
+                font-size: 0.9rem;
+            }
+            .counter {
+                top: 15px;
+                right: 20px;
+                font-size: 0.9rem;
+            }
+            .music-control {
+                top: 15px;
+                left: 20px;
+                padding: 8px 15px;
+            }
+            .volume-control {
+                display: none;
+            }
+            .music-info {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Opening Screen -->
+    <div class="opening-screen" id="openingScreen">
+        <h1 class="opening-title">Kenangan Keluarga Kita</h1>
+        <p class="opening-subtitle">"Setiap detik bersama adalah hadiah yang tak ternilai"</p>
+        <button class="start-button" onclick="startSlideshow()">MULA PERJALANAN</button>
+        <p style="margin-top: 20px; color: rgba(255,255,255,0.5); font-size: 0.9rem;">Tekan <strong>ENTER</strong> untuk mula</p>
+    </div>
+
+    <!-- Main Slideshow -->
+    <div class="slideshow-container" id="slideshowContainer" style="display: none;">
+        <!-- Particles -->
+        <div class="particles" id="particles"></div>
+
+        <!-- Slides will be inserted here by JavaScript -->
+        <div id="slidesContainer"></div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar"></div>
+
+        <!-- Counter -->
+        <div class="counter" id="counter">1 / 83</div>
+
+        <!-- Music Control -->
+        <div class="music-control" id="musicControl">
+            <button class="music-toggle" id="musicToggle" onclick="toggleMusic()">
+                🎵
+            </button>
+            <div class="music-info">
+                <div class="music-title">Memori Tercipta</div>
+                <div class="music-artist">Shila Amzah</div>
+            </div>
+            <div class="volume-control">
+                <span style="font-size: 0.9rem;">♪</span>
+                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls" id="controls">
+            <button class="control-btn" onclick="previousSlide()">◀</button>
+            <button class="control-btn play-pause" id="playPauseBtn" onclick="togglePlayPause()">⏸</button>
+            <button class="control-btn" onclick="nextSlide()">▶</button>
+        </div>
+
+        <!-- Playback Indicator -->
+        <div class="playback-indicator" id="playbackIndicator">⏸</div>
+    </div>
+
+    <!-- Ending Screen -->
+    <div class="ending-screen" id="endingScreen">
+        <h1 class="ending-title">Terima Kasih</h1>
+        <p class="ending-message">
+            "Keluarga bukan tentang darah.<br>
+            Ia tentang siapa yang sentiasa ada untuk kita.<br>
+            Terima kasih atas setiap kenangan indah ini."
+        </p>
+    </div>
+
+    <!-- Audio Element for Background Music - Memori Tercipta by Shila Amzah -->
+    <audio id="bgMusic" loop>
+        <source src="Shila Amzah - Memori Tercipta [ Lirik ].mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Image list - akan load semua gambar dari folder
+        const images = [
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.05.41 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.08.39 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.10.39 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.29.30 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.32.10 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.34.18 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.35.46 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.36.37 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 11.40.52 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 6.58.36 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.09.57 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.10.32 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.11.24 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.12.09 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.12.51 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.14.08 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.15.06 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.15.34 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.16.40 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.17.12 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.19.44 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.21.11 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.54.54 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.55.54 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.56.59 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.57.44 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.58.38 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 7.59.51 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 8.00.37 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 8.01.18 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-14 at 8.02.30 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.21.50 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.21.52 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.00 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.00 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.01 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.01 PM (2).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.01 PM (3).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.01 PM (4).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.01 PM (5).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.01 PM (6).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.01 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.02 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.02 PM (2).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.02 PM (3).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.02 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (10).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (11).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (12).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (13).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (14).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (15).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (2).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (3).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (4).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (5).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (6).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (7).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (8).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM (9).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.03 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.04 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.04 PM (2).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.04 PM (3).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.04 PM (4).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 1.22.04 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.34 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.35 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.35 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.36 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.37 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.38 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.38 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.39 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.39 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.40 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.41 PM (1).jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.41 PM.jpeg",
+            "Gambar Kenangan/WhatsApp Image 2026-03-19 at 2.03.42 PM.jpeg",
+            "Gambar Kenangan/Closing_Heart.png"
+        ];
+
+        // Emotional quotes untuk certain slides
+        const emotionalMoments = {
+            0: { caption: "Perjalanan Kita Bermula", quote: "" },
+            10: { caption: "Detik-Detik Berharga", quote: "Setiap saat bersama adalah hadiah" },
+            20: { caption: "Senyuman Yang Indah", quote: "Kebahagiaan yang dikongsi bersama" },
+            30: { caption: "Kenangan Abadi", quote: "Masa berlalu, kenangan kekal" },
+            40: { caption: "Ikatan Keluarga", quote: "Bersama dalam suka dan duka" },
+            50: { caption: "Cinta Yang Tidak Berpenghujung", quote: "Keluarga adalah segalanya" },
+            60: { caption: "Kekuatan Dalam Kesatuan", quote: "Bersatu kita teguh" },
+            70: { caption: "Warisan Kasih Sayang", quote: "Untuk generasi akan datang" },
+            82: { caption: "Cinta Kekal Selamanya", quote: "Kenangan bersama yang takkan pernah luntur" }
+        };
+
+        let currentSlide = 0;
+        let isPlaying = true;
+        let slideInterval;
+        let slideDuration = 5000; // Default 5 seconds per slide, will be auto-adjusted
+        let musicPlaying = false;
+        let hideControlsTimeout;
+        let controlsVisible = true;
+        let musicDuration = 0;
+        const totalSlides = 83;
+
+        // Initialize
+        function init() {
+            createParticles();
+            createSlides();
+            setupAudioControls();
+            setupControlsAutoHide();
+        }
+
+        // Auto-hide controls when playing
+        function setupControlsAutoHide() {
+            const slideshowContainer = document.getElementById('slideshowContainer');
+            
+            // Show controls on mouse move
+            slideshowContainer.addEventListener('mousemove', () => {
+                showControls();
+                
+                // Only auto-hide if playing
+                if (isPlaying) {
+                    resetHideControlsTimer();
+                }
+            });
+
+            // Show controls on mouse enter
+            slideshowContainer.addEventListener('mouseenter', () => {
+                showControls();
+            });
+        }
+
+        function showControls() {
+            if (!controlsVisible) {
+                controlsVisible = true;
+                document.getElementById('controls').classList.remove('hidden');
+                document.getElementById('counter').classList.remove('hidden');
+                document.getElementById('musicControl').classList.remove('hidden');
+                document.getElementById('progressBar').classList.remove('hidden');
+                document.body.style.cursor = 'default';
+            }
+        }
+
+        function hideControls() {
+            if (controlsVisible && isPlaying) {
+                controlsVisible = false;
+                document.getElementById('controls').classList.add('hidden');
+                document.getElementById('counter').classList.add('hidden');
+                document.getElementById('musicControl').classList.add('hidden');
+                document.getElementById('progressBar').classList.add('hidden');
+                document.body.style.cursor = 'none';
+            }
+        }
+
+        function resetHideControlsTimer() {
+            clearTimeout(hideControlsTimeout);
+            hideControlsTimeout = setTimeout(() => {
+                if (isPlaying) {
+                    hideControls();
+                }
+            }, 3000); // Hide after 3 seconds of inactivity
+        }
+
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 4 + 1;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 15 + 10) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        function createSlides() {
+            const container = document.getElementById('slidesContainer');
+            images.forEach((img, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                slide.id = `slide-${index}`;
+                
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'slide-image-container';
+                
+                const image = document.createElement('img');
+                image.src = img;
+                image.alt = `Kenangan ${index + 1}`;
+                
+                imageContainer.appendChild(image);
+                slide.appendChild(imageContainer);
+
+                // Add text overlay if it's an emotional moment
+                if (emotionalMoments[index]) {
+                    const textDiv = document.createElement('div');
+                    textDiv.className = 'slide-text';
+                    
+                    if (emotionalMoments[index].caption) {
+                        const caption = document.createElement('div');
+                        caption.className = 'slide-caption';
+                        caption.textContent = emotionalMoments[index].caption;
+                        textDiv.appendChild(caption);
+                    }
+                    
+                    if (emotionalMoments[index].quote) {
+                        const quote = document.createElement('div');
+                        quote.className = 'slide-quote';
+                        quote.textContent = `"${emotionalMoments[index].quote}"`;
+                        textDiv.appendChild(quote);
+                    }
+                    
+                    slide.appendChild(textDiv);
+                }
+                
+                container.appendChild(slide);
+            });
+        }
+
+        function setupAudioControls() {
+            const audio = document.getElementById('bgMusic');
+            const volumeSlider = document.getElementById('volumeSlider');
+            
+            audio.volume = 0.7;
+            
+            volumeSlider.addEventListener('input', function() {
+                audio.volume = this.value / 100;
+            });
+
+            // Auto-sync slideshow duration with music duration
+            audio.addEventListener('loadedmetadata', function() {
+                musicDuration = audio.duration;
+                
+                // Calculate perfect slide duration to sync with music
+                // Reserve 2 seconds for opening and 3 seconds for last slide to show
+                const availableTime = musicDuration - 5; 
+                slideDuration = Math.floor((availableTime / totalSlides) * 1000);
+                
+                console.log(`🎵 Music Duration: ${musicDuration.toFixed(2)}s`);
+                console.log(`📸 Slide Duration: ${(slideDuration/1000).toFixed(2)}s per slide`);
+                console.log(`🎬 Total Slideshow: ${((slideDuration * totalSlides)/1000).toFixed(2)}s`);
+                console.log(`✅ Synced perfectly!`);
+            });
+
+            // Backup sync: When music ends, show ending screen
+            audio.addEventListener('ended', function() {
+                console.log('🎵 Music ended - showing ending screen');
+                if (document.getElementById('slideshowContainer').style.display === 'block') {
+                    setTimeout(() => {
+                        showEndingScreen();
+                    }, 500);
+                }
+            });
+        }
+
+        function startSlideshow() {
+            // Enter fullscreen automatically
+            enterFullscreen();
+            
+            document.getElementById('openingScreen').classList.add('hide');
+            setTimeout(() => {
+                document.getElementById('openingScreen').style.display = 'none';
+                document.getElementById('slideshowContainer').style.display = 'block';
+                showSlide(0);
+                startAutoPlay();
+                
+                // Auto-play music when slideshow starts
+                const audio = document.getElementById('bgMusic');
+                audio.play().then(() => {
+                    musicPlaying = true;
+                    document.getElementById('musicToggle').textContent = '🎵';
+                }).catch(err => {
+                    console.log('Autoplay prevented. User needs to click music button.');
+                });
+
+                // Start auto-hide controls after 3 seconds
+                resetHideControlsTimer();
+            }, 2000);
+        }
+
+        function showSlide(index) {
+            // Remove active class from all slides
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            // Add active class to current slide
+            const currentSlideElement = document.getElementById(`slide-${index}`);
+            if (currentSlideElement) {
+                currentSlideElement.classList.add('active');
+            }
+            
+            currentSlide = index;
+            updateCounter();
+            updateProgressBar();
+            
+            // Check if it's the last slide
+            if (index === images.length - 1) {
+                setTimeout(() => {
+                    showEndingScreen();
+                }, slideDuration);
+            }
+        }
+
+        function nextSlide() {
+            const nextIndex = currentSlide + 1;
+            if (nextIndex < images.length) {
+                showSlide(nextIndex);
+            } else {
+                showEndingScreen();
+            }
+        }
+
+        function previousSlide() {
+            const prevIndex = currentSlide - 1;
+            if (prevIndex >= 0) {
+                showSlide(prevIndex);
+            }
+        }
+
+        function startAutoPlay() {
+            if (isPlaying) {
+                slideInterval = setInterval(() => {
+                    nextSlide();
+                }, slideDuration);
+            }
+        }
+
+        function stopAutoPlay() {
+            clearInterval(slideInterval);
+        }
+
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            const btn = document.getElementById('playPauseBtn');
+            const audio = document.getElementById('bgMusic');
+            const indicator = document.getElementById('playbackIndicator');
+            
+            if (isPlaying) {
+                btn.textContent = '⏸';
+                startAutoPlay();
+                // Resume music if it was playing
+                if (musicPlaying) {
+                    audio.play();
+                }
+                // Show play indicator
+                indicator.textContent = '▶';
+                showPlaybackIndicator();
+                // Start auto-hide timer
+                resetHideControlsTimer();
+            } else {
+                btn.textContent = '▶';
+                stopAutoPlay();
+                // Pause music too
+                audio.pause();
+                // Show pause indicator
+                indicator.textContent = '⏸';
+                showPlaybackIndicator();
+                // Show controls when paused
+                clearTimeout(hideControlsTimeout);
+                showControls();
+            }
+        }
+
+        function showPlaybackIndicator() {
+            const indicator = document.getElementById('playbackIndicator');
+            indicator.classList.remove('show');
+            // Trigger reflow to restart animation
+            void indicator.offsetWidth;
+            indicator.classList.add('show');
+            
+            // Remove class after animation
+            setTimeout(() => {
+                indicator.classList.remove('show');
+            }, 600);
+        }
+
+        function toggleMusic() {
+            const audio = document.getElementById('bgMusic');
+            const btn = document.getElementById('musicToggle');
+            
+            if (musicPlaying) {
+                audio.pause();
+                btn.textContent = '🔇';
+                musicPlaying = false;
+            } else {
+                audio.play().then(() => {
+                    btn.textContent = '🎵';
+                    musicPlaying = true;
+                }).catch(err => {
+                    alert('Tidak dapat play muzik. Sila check file audio ada dalam folder!');
+                });
+            }
+        }
+
+        function updateCounter() {
+            document.getElementById('counter').textContent = `${currentSlide + 1} / ${images.length}`;
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentSlide + 1) / images.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showEndingScreen() {
+            stopAutoPlay();
+            
+            // Fade out music smoothly
+            const audio = document.getElementById('bgMusic');
+            const fadeOutDuration = 2000; // 2 seconds fade out
+            const fadeSteps = 20;
+            const fadeInterval = fadeOutDuration / fadeSteps;
+            const volumeStep = audio.volume / fadeSteps;
+            
+            let currentStep = 0;
+            const fadeOut = setInterval(() => {
+                currentStep++;
+                audio.volume = Math.max(0, audio.volume - volumeStep);
+                
+                if (currentStep >= fadeSteps || audio.volume <= 0) {
+                    clearInterval(fadeOut);
+                    audio.volume = 0.7; // Reset for replay
+                }
+            }, fadeInterval);
+            
+            document.getElementById('slideshowContainer').style.display = 'none';
+            document.getElementById('endingScreen').classList.add('show');
+        }
+
+
+        // Fullscreen functions
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            const openingScreen = document.getElementById('openingScreen');
+            const slideshowContainer = document.getElementById('slideshowContainer');
+            const endingScreen = document.getElementById('endingScreen');
+            
+            // If opening screen is visible, Enter starts slideshow
+            if (openingScreen.style.display !== 'none' && !openingScreen.classList.contains('hide')) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    startSlideshow();
+                }
+            }
+            // If slideshow is active
+            else if (slideshowContainer.style.display === 'block') {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    togglePlayPause();
+                }
+                if (e.key === 'ArrowRight') nextSlide();
+                if (e.key === 'ArrowLeft') previousSlide();
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    togglePlayPause();
+                }
+                if (e.key === 'm' || e.key === 'M') toggleMusic();
+                if (e.key === 'f' || e.key === 'F') {
+                    e.preventDefault();
+                    if (!document.fullscreenElement) {
+                        enterFullscreen();
+                    } else {
+                        exitFullscreen();
+                    }
+                }
+                if (e.key === 'Escape') {
+                    // ESC will exit fullscreen automatically by browser
+                }
+            }
+            // If ending screen is showing - no replay option
+            else if (endingScreen.classList.contains('show')) {
+                // Ending screen - no actions available
+            }
+        });
+
+        // Initialize when page loads
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
